@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Wassim Dev">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3524/3524335.png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            overflow-x: hidden; font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Loader */
+        #loader-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .bar-container { width: 200px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-top: 10px; }
+        #progress-bar { width: 0%; height: 100%; background: #FFD700; border-radius: 10px; }
+
+        .top-nav { position: fixed; top: 20px; left: 20px; display: flex; gap: 20px; z-index: 1000; }
+        .top-nav i, .top-nav a { color: white; font-size: 24px; cursor: pointer; transition: 0.3s; text-decoration: none; }
+        .top-nav i:hover { transform: scale(1.2); color: #FFD700; }
+
+        #main-content {
+            display: none; opacity: 0; width: 90%; max-width: 500px;
+            text-align: center; color: white; padding: 20px; margin-top: 50px;
+        }
+
+        .contact-box {
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
+            padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3); margin-top: 20px;
+        }
+
+        .contact-box input, .contact-box textarea {
+            width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px; outline: none; box-sizing: border-box;
+        }
+
+        .contact-box input[type="file"] { background: rgba(255,255,255,0.1); color: white; cursor: pointer; }
+
+        .btn-send {
+            width: 100%; padding: 12px; border: none; border-radius: 10px;
+            background: #FFD700; color: #333; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+
+        #messages-list { margin-top: 25px; width: 100%; display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
+        
+        .msg-card {
+            background: white; color: #333; padding: 15px; border-radius: 15px;
+            text-align: left; animation: slideIn 0.4s ease forwards;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative;
+        }
+
+        .msg-card b { color: #e73c7e; display: block; margin-bottom: 5px; font-size: 1.1rem; }
+        .msg-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: block; }
+
+        .del-btn {
+            position: absolute; top: 10px; right: 10px; color: #ccc; cursor: pointer; transition: 0.3s;
+        }
+        .del-btn:hover { color: #e74c3c; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        #settings-popup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
+            z-index: 2000; justify-content: center; align-items: center;
+        }
+        .popup-card { background: white; padding: 30px; border-radius: 20px; text-align: center; width: 250px; }
+        .popup-card h2 { font-family: 'Pacifico', cursive; background: linear-gradient(45deg, #8e44ad, #e73c7e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <i class="fa-solid fa-gear" onclick="toggleSettings()"></i>
+        <a href="https://www.tiktok.com/@tsvdhli?_r=1&_t=ZM-93EseNYZYDs" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://youtube.com/@wassimftouhi-dev?si=JrUUG2LS4UJiCbyX" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+
+    <div id="loader-screen">
+        <div style="color: white; font-weight: bold;" id="percent">0%</div>
+        <div class="bar-container"><div id="progress-bar"></div></div>
+    </div>
+
+    <div id="main-content">
+        <h1 style="font-family: 'Pacifico'; font-size: 40px; margin: 0;">Wassim Dev</h1>
+        
+        <div class="contact-box">
+            <input type="text" id="fname" placeholder="First Name">
+            <input type="text" id="lname" placeholder="Last Name">
+            <textarea id="msg" rows="3" placeholder="Write your message..."></textarea>
+            <input type="file" id="imageInput" accept="image/*">
+            <button class="btn-send" onclick="sendMessage()">Send Post</button>
+        </div>
+
+        <div id="messages-list"></div>
+    </div>
+
+    <div id="settings-popup">
+        <div class="popup-card">
+            <h2>Settings</h2>
+            <button style="background:#e67e22; color:white; margin-bottom:10px" class="btn-send" onclick="clearAllMessages()">Clear All Data</button>
+            <button style="background:#8e44ad; color:white; margin-bottom:10px" class="btn-send" onclick="toggleSettings()">Return</button>
+            <button style="background:#e74c3c; color:white;" class="btn-send" onclick="window.location.href='https://google.com'">Quit</button>
+        </div>
+    </div>
+
+    <script>
+        // Loading Logic
+        let width = 0;
+        let interval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(interval);
+                document.getElementById('loader-screen').style.display = 'none';
+                let content = document.getElementById('main-content');
+                content.style.display = 'block';
+                setTimeout(() => content.style.opacity = '1', 50);
+                loadMessages();
+            } else {
+                width++;
+                document.getElementById('progress-bar').style.width = width + '%';
+                document.getElementById('percent').innerText = width + '%';
+            }
+        }, 10);
+
+        function sendMessage() {
+            const fname = document.getElementById('fname').value;
+            const lname = document.getElementById('lname').value;
+            const msg = document.getElementById('msg').value;
+            const imageInput = document.getElementById('imageInput');
+
+            if(fname === "" || lname === "" || msg === "") {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            let imageData = "";
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageData = e.target.result;
+                    saveAndDisplay(fname, lname, msg, imageData);
+                }
+                reader.readAsDataURL(imageInput.files[0]);
+            } else {
+                saveAndDisplay(fname, lname, msg, "");
+            }
+        }
+
+        function saveAndDisplay(fname, lname, msg, img) {
+            const newPost = { fname, lname, msg, img, id: Date.now() };
+            let posts = JSON.parse(localStorage.getItem('my_posts')) || [];
+            posts.unshift(newPost);
+            localStorage.setItem('my_posts', JSON.stringify(posts));
+            displayPost(newPost);
+            document.getElementById('fname').value = "";
+            document.getElementById('lname').value = "";
+            document.getElementById('msg').value = "";
+            document.getElementById('imageInput').value = "";
+        }
+
+        function displayPost(post) {
+            const list = document.getElementById('messages-list');
+            const card = document.createElement('div');
+            card.className = 'msg-card';
+            card.id = `post-${post.id}`;
+            card.innerHTML = `
+                <i class="fa-solid fa-trash del-btn" onclick="deletePost(${post.id})"></i>
+                <b>${post.fname} ${post.lname}</b>
+                <p style="margin:0">${post.msg}</p>
+                ${post.img ? `<img src="${post.img}" class="msg-img">` : ''}
+            `;
+            list.prepend(card);
+        }
+
+        function loadMessages() {
+            let posts = JSON.parse(localStorage.getItem('my_posts')) || [];
+            document.getElementById('messages-list').innerHTML = "";
+            posts.reverse().forEach(post => displayPost(post));
+        }
+
+        function deletePost(id) {
+            let posts = JSON.parse(localStorage.getItem('my_posts')) || [];
+            posts = posts.filter(p => p.id !== id);
+            localStorage.setItem('my_posts', JSON.stringify(posts));
+            document.getElementById(`post-${id}`).remove();
+        }
+
+        function clearAllMessages() {
+            if(confirm("Are you sure?")) {
+                localStorage.removeItem('my_posts');
+                document.getElementById('messages-list').innerHTML = "";
+                toggleSettings();
+            }
+        }
+
+        function toggleSettings() {
+            let popup = document.getElementById('settings-popup');
+            popup.style.display = (popup.style.display === 'flex') ? 'none' : 'flex';
+        }
+    </script>
+</body>
+</html>
